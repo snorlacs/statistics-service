@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.time.Instant;
 import java.util.Date;
 
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -44,6 +45,7 @@ public class TransactionControllerTest {
         TransactionController transactionController = new TransactionController(transactionService);
         mvc = MockMvcBuilders
                 .standaloneSetup(transactionController)
+                .setControllerAdvice(new ControllerErrorHandler())
                 .build();
     }
 
@@ -57,5 +59,24 @@ public class TransactionControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isCreated());
 
         verify(transactionService).recordTransaction(transaction);
+    }
+
+    @Test
+    public void shouldReturnBadRequestIfTimestampIsOlderThan60Seconds() throws Exception {
+        String requestString = "{\"amount\":2.33,\"timestamp\":1524949698038}";
+
+        mvc.perform(MockMvcRequestBuilders.post("/transactions")
+                .content(requestString)
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void shouldThrowInternalServerIfServiceReturnsARuntimeException() throws Exception {
+        Transaction transaction = new Transaction(2.33, new Date(Instant.now().toEpochMilli()));
+        doThrow(new RuntimeException()).when(transactionService).recordTransaction(transaction);
+
+        mvc.perform(MockMvcRequestBuilders.post("/transactions")
+                .content(objectMapper.writeValueAsString(transaction))
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isInternalServerError());
     }
 }
