@@ -1,0 +1,32 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.10.RELEASE")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+
+
+jar {
+    baseName = 'statistic-keeper'
+    version =  '1.0.0'
+}
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile('org.projectlombok:lombok:1.16.16')
+    compile("org.springframework.boot:spring-boot-starter-web")
+    compile group: 'org.springframework.plugin', name: 'spring-plugin-core', version: '1.2.0.RELEASE'
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '1.5.10.RELEASE'
+    testCompile('junit:junit')
+}
