@@ -1,9 +1,7 @@
 package com.statistics.domain;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-
 import java.util.DoubleSummaryStatistics;
+import java.util.Objects;
 
 public class Statistics {
     private final double sum;
@@ -51,12 +49,19 @@ public class Statistics {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        return EqualsBuilder.reflectionEquals(this, obj);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Statistics that = (Statistics) o;
+        return Double.compare(that.sum, sum) == 0 &&
+                Double.compare(that.average, average) == 0 &&
+                Double.compare(that.max, max) == 0 &&
+                Double.compare(that.min, min) == 0 &&
+                Double.compare(that.count, count) == 0;
     }
 
     @Override
     public int hashCode() {
-        return HashCodeBuilder.reflectionHashCode(this);
+        return Objects.hash(sum, average, max, min, count);
     }
 }

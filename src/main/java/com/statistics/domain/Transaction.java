@@ -2,10 +2,9 @@ package com.statistics.domain;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.statistics.validation.ValidTimestamp;
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import java.util.Date;
+import java.util.Objects;
 
 @JsonAutoDetect
 public class Transaction {
@@ -33,12 +32,16 @@ public class Transaction {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        return EqualsBuilder.reflectionEquals(this, obj);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Transaction that = (Transaction) o;
+        return Double.compare(that.amount, amount) == 0 &&
+                Objects.equals(timestamp, that.timestamp);
     }
 
     @Override
     public int hashCode() {
-        return HashCodeBuilder.reflectionHashCode(this);
+        return Objects.hash(amount, timestamp);
     }
 }

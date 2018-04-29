@@ -8,6 +8,7 @@ import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.Date;
 import java.util.concurrent.ConcurrentSkipListMap;
 
@@ -30,6 +31,15 @@ public class StatisticsServiceTest {
         statisticsService.update(transactions.values());
 
         assertEquals(statisticsService.getStatistics(), new Statistics(6.66,3.33,4.33,2.33,2));
+    }
+
+    @Test(expected = NoTransactionsMadeException.class)
+    public void shouldThrowExceptionWhenUpdateIsCalleedWithEmptyTransactions() throws Exception {
+
+        StatisticsService statisticsService = new StatisticsService();
+        ConcurrentSkipListMap<Date, Transaction> emptyTransactions = new ConcurrentSkipListMap<>();
+        statisticsService.update(emptyTransactions.values());
+        statisticsService.getStatistics();
     }
 
     @Test(expected = NoTransactionsMadeException.class)
