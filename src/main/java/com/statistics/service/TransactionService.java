@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 @Service
 public class TransactionService {
 
+    public static final long TRANSACTION_WINDOW_SECONDS = 60L;
     private ConcurrentSkipListMap<Date, Transaction> transactions = new ConcurrentSkipListMap<>();
 
     private final StatisticsService statisticsService;
@@ -21,11 +22,15 @@ public class TransactionService {
     }
 
     public void recordTransaction(final Transaction transaction) {
-        Date startTime = Date.from(Instant.now().minusSeconds(60L));
         transactions.put(transaction.getTimestamp(), transaction);
+        updateTransactions();
+    }
 
-        ConcurrentSkipListMap<Date, Transaction> transactionFromStartTime = truncateOldTransactions(transactions, startTime);
-        statisticsService.update(transactionFromStartTime.values());
+    public void updateTransactions() {
+        if(!transactions.isEmpty()) {
+            ConcurrentSkipListMap<Date, Transaction> transactionInLast60Seconds = truncateOldTransactions(transactions, Date.from(Instant.now().minusSeconds(TRANSACTION_WINDOW_SECONDS)));
+            statisticsService.update(transactionInLast60Seconds.values());
+        }
     }
 
     private ConcurrentSkipListMap<Date, Transaction> truncateOldTransactions(final ConcurrentSkipListMap<Date, Transaction> transactions, final Date startTime) {

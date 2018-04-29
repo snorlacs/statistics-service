@@ -2,6 +2,7 @@ package com.statistics.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.statistics.domain.Statistics;
+import com.statistics.exception.NoTransactionsMadeException;
 import com.statistics.service.StatisticsService;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,6 +44,7 @@ public class StatisticsControllerTest {
 
         mockMvc = MockMvcBuilders
                     .standaloneSetup(statisticsController)
+                    .setControllerAdvice(new ControllerErrorHandler())
                     .build();
     }
 
@@ -56,5 +58,14 @@ public class StatisticsControllerTest {
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(responseString));
+    }
+
+    @Test
+    public void shouldReturnNoContentWhenThereIsNoTransactionMadeInLast60Seconds() throws Exception {
+        when(statisticsService.getStatistics()).thenThrow(new NoTransactionsMadeException("No Transaction made in last 60 seconds"));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/statistics")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
     }
 }

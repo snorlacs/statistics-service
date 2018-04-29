@@ -2,6 +2,7 @@ package com.statistics.service;
 
 import com.statistics.domain.Statistics;
 import com.statistics.domain.Transaction;
+import com.statistics.exception.NoTransactionsMadeException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -29,5 +30,13 @@ public class StatisticsServiceTest {
         statisticsService.update(transactions.values());
 
         assertEquals(statisticsService.getStatistics(), new Statistics(6.66,3.33,4.33,2.33,2));
+    }
+
+    @Test(expected = NoTransactionsMadeException.class)
+    public void shouldThrowExceptionWhenStatisticsIsNull() throws Exception {
+
+        StatisticsService statisticsService = new StatisticsService();
+
+        statisticsService.getStatistics();
     }
 }

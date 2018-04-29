@@ -17,6 +17,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TransactionServiceTest {
@@ -81,5 +82,11 @@ public class TransactionServiceTest {
         verify(statisticsService, times(2)).update(captor.capture());
         assertTrue(captor.getAllValues().get(1).containsAll(validMap.values()));
         assertEquals(captor.getAllValues().get(1).size(), 1);
+    }
+
+    @Test
+    public void shouldNotUpdateStatisticsWhenThereAreNoTransactionsAfterTruncation() throws Exception {
+        transactionService.updateTransactions();
+        verifyNoMoreInteractions(statisticsService);
     }
 }
